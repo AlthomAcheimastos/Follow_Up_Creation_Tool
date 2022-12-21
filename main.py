@@ -23,7 +23,8 @@ from bin.fun_run_start import (
     fun_run_1_start, 
     fun_run_2_start, 
     fun_run_3_start, 
-    fun_run_8_start, 
+    fun_run_8_start,
+    fun_run_9_start,
     fun_generate_authors_start,
     fun_generate_msns_start
 )
@@ -95,7 +96,7 @@ class MainWindow(QMainWindow):
         load_ui(os.path.join(SCRIPT_DIRECTORY, 'ui/UI.ui'), self)
 
         # Add colour to all "Run" buttons
-        for btn in ['btn_run_0', 'btn_run_1', 'btn_run_2', 'btn_run_3', 'btn_run_6', 'btn_run_7', 'btn_run_8', 'btn_generate_msns', 'btn_generate_authors']:
+        for btn in ['btn_run_0', 'btn_run_1', 'btn_run_2', 'btn_run_3', 'btn_run_6', 'btn_run_7', 'btn_run_8', 'btn_run_9', 'btn_generate_msns', 'btn_generate_authors']:
             self.findChild(QPushButton, btn).setStyleSheet("background-color: #FFD966")
 
 
@@ -147,6 +148,12 @@ class MainWindow(QMainWindow):
         self.findChild(QPushButton, 'btn_one_follow_up').clicked.connect(lambda: self.fun_one_follow_up())
         self.findChild(QPushButton, 'btn_run_0').clicked.connect(lambda: self.fun_run_0())
 
+        # Create ALL-NCs
+        self.findChild(QPushButton, 'btn_json_6').clicked.connect(lambda: self.fun_json())
+        self.findChild(QPushButton, 'btn_mdl_all_MSNs').clicked.connect(lambda: self.fun_all_mdl())
+        self.findChild(QPushButton, 'btn_mdl_rev_MSNs').clicked.connect(lambda: self.fun_rev_mdl())
+        self.findChild(QPushButton, 'btn_run_9').clicked.connect(lambda: self.fun_run_9())
+
 
     def fun_one_follow_up(self):
         self.filepath_one_follow_up = QFileDialog.getOpenFileName(self, 'Select a Follow-up', SCRIPT_DIRECTORY, 'Excel File (*.xlsx)')[0]
@@ -175,6 +182,11 @@ class MainWindow(QMainWindow):
     def fun_new_follow_up(self):
         self.filepath_new_follow_up = QFileDialog.getOpenFileName(self, 'Select Temporary Follow-up', SCRIPT_DIRECTORY, 'Excel File (*.xlsx)')[0]
 
+    def fun_all_mdl(self):
+        self.filepath_all_mdl = QFileDialog.getExistingDirectory(self, 'Select folder with the Latest MDLs for All MSNs', SCRIPT_DIRECTORY)
+    
+    def fun_rev_mdl(self):
+        self.filepath_rev_mdl = QFileDialog.getExistingDirectory(self, 'Select folder with the MDLs that where incorporated last time for Rev MSNs', SCRIPT_DIRECTORY)
     
     #############################################
     def my_console_update(self, text: str = '', clear: bool = False):
@@ -389,8 +401,6 @@ class MainWindow(QMainWindow):
         self.threadpool.start(self.worker)
 
 
-
-
     def fun_run_8(self):
         # Initial Checks
         if not hasattr(self, 'filepath_json') or self.filepath_json == '':
@@ -427,6 +437,42 @@ class MainWindow(QMainWindow):
         self.threadpool.start(self.worker)
 
 
+    def fun_run_9(self):
+        """
+        For All-NCs
+        """
+        # Get Revision and excelfilepath
+        revision = self.findChild(QLineEdit, 'input_revision_2').text()
+        if revision == '': revision = 'XX'
+        # excelfilepath = f'ALL_NCs_R{revision}.xlsx'
+
+        # Initial Checks
+        if not hasattr(self, 'filepath_json') or self.filepath_json == '':
+            return self.my_console_update(text='Give the Latest JSON File with MSNs first.', clear=True)
+        if not hasattr(self, 'filepath_all_mdl') or self.filepath_all_mdl == '':
+            return self.my_console_update(text='Give folder with the Latest MDLs for All MSNs first.', clear=True)
+        if not hasattr(self, 'filepath_rev_mdl') or self.filepath_rev_mdl == '':
+            return self.my_console_update(text='Give folder with the MDLs that where incorporated last time for Rev MSNs first.', clear=True)
+
+        # Clear before starting
+        self.my_console_update(clear=True)
+
+        # Pass the function to execute
+        self.worker = Worker(
+            fun_run_9_start,
+            self.filepath_json,
+            self.filepath_all_mdl,
+            self.filepath_rev_mdl,
+            revision,
+            console=True
+        )  # Any other args, kwargs are passed to the run function
+
+        # Make Connections
+        # self.worker.signals.result.connect(self.save_result)
+        self.worker.signals.console.connect(self.my_console_update)
+
+        # Execute
+        self.threadpool.start(self.worker)
 
 
 if __name__ == '__main__':
