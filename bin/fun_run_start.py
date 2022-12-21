@@ -6,6 +6,8 @@
 ##########################################################################################
 
 import os
+import regex as re
+import numpy as np
 from PySide2.QtCore import *
 from bin.pseudo_db import (
     follow_up_to_pseudo_db,
@@ -29,7 +31,8 @@ from bin.setup_follow_up import (
 from bin.save_to_excel import (
     pseudo_db_to_excel,
     initial_follow_up_to_excel,
-    final_follow_up_to_excel
+    final_follow_up_to_excel,
+    all_NCs_to_excel
 )
 
 from bin.partials import (
@@ -44,6 +47,12 @@ from bin.partials import (
 from bin.create_json import (
     create_json_msns,
     create_json_authors
+)
+
+from bin.all_NCs import (
+    read_MDLs_for_NCs,
+    update_90_day_rev,
+    replace_letters_with_MSNs
 )
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -323,3 +332,47 @@ def fun_run_8_start(filepath_json: str, filepath_json_authors: str, filepath_old
     console.emit('> Manually set formatting of dates to DD/MM/YYYY.')
     console.emit('> Manually add any other Sheets.')
     console.emit('> Use "MSN Change" columns at the far right to manually colour the cells.')
+
+
+def fun_run_9_start(filepath_json: str, filepath_mdl_new: str, filepath_mdl_old: str, revision: str, console: Signal = Signal('')):
+    # Read old MDLs for 90-Day Revisions
+    # Check that 90-Day Revisions have both old and new MDLs
+
+    # Read JSON with MSNs
+    console.emit('Reading JSON file with MSNs.')
+    json_MSNs = read_JSON(filepath_json)
+    new_msn_list = json_MSNs['new']
+    rev_msn_list = json_MSNs['rev']
+
+    # Read Latest MDLs for all MSNs
+    console.emit('Reading the latest MDLs for all MSNs.')
+    mdl_msn_list_new, nc_dict_new = read_MDLs_for_NCs(filepath_mdl_new)
+
+    # Read OLD MDLs for 90-Day Revision MSNs
+    console.emit('Reading MDLs that where incorporated last time for the 90-Day Revision MSNs.')
+    mdl_msn_list_old, nc_dict_old = read_MDLs_for_NCs(filepath_mdl_old)
+    console.emit('Finding Phantom-New (PN) and Phantom-Deleted (PD).')
+    nc_dict_new = update_90_day_rev(nc_dict_new, nc_dict_old, rev_msn_list)
+
+    # Merge DataFrames
+    console.emit('Merging NCs from all MDLs.')
+    nc_list = list(nc_dict_new.values())
+    df_nc = merge_dfs(nc_list)
+
+    # Get lists
+    mdl_list = [x for x in list(df_nc.columns) if re.findall(r'^\d{4}_', x)]
+    current_mdl_list = [x for x in list(df_nc.columns) if (x[:4] in new_msn_list) or (x[:4] in rev_msn_list)]
+    old_mdl_list = list(set(mdl_list) - set(current_mdl_list))
+
+    # Replace Letters with MSNs and letters. i.e. 'N' -> '1207 (N)'
+    console.emit('Replacing letters with MSNs and letters. i.e. "N" -> "1207 (N)"')
+    df_nc = replace_letters_with_MSNs(df_nc, mdl_list)
+
+    # Get only Current NCs
+    df_nc_RXX = df_nc.drop(old_mdl_list, axis=1)
+    df_nc_RXX = df_nc_RXX.replace('', np.nan).dropna(subset=current_mdl_list, how='all')
+
+    # Save to excel
+    console.emit('Saving ALL_NCs')
+    all_NCs_to_excel(df_nc, df_nc_RXX, new_msn_list, rev_msn_list, revision)
+    console.emit('---> Finished.')

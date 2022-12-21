@@ -2,7 +2,7 @@
 # Filename:     save_to_excel.py
 # For:          Follow_Up_Creation_Tool
 # Author:       Spyros Acheimastos (acheimastos@althom.eu)
-# Date:         15/12/2022
+# Date:         21/12/2022
 ##########################################################################################
 
 import string
@@ -598,6 +598,71 @@ def add_sheet_QB_illu(workbook, formats: dict, prop_dict: dict):
     return workbook
 
 
+def format_sheet_ALL_NCs(writer, formats: dict, sheet_name: str, column_names: list, new_msn_list: list, rev_msn_list: list):
+    """
+    Format the 'ALL_NCs' or 'RXX_NCs' sheet.
+
+    Args:
+    ----------
+        writer:
+            An xlsxwriter writer.
+
+        formats:
+            A dictionary with the created formats.
+
+        sheet_name:
+            The name of the Sheet. ('ALL_NCs' or 'RXX_NCs')
+
+        column_names:
+            A list with the column names of the DataFrame.
+        
+        new_msn_list:
+            A list with the New MSNs for this revision.
+
+        rev_msn_list:
+            A list with the 90-Day Revision MSNs for this revision.
+    """
+    worksheet = writer.sheets[sheet_name]
+    worksheet.freeze_panes(1, 0)
+
+    # Set format for columns
+    worksheet.set_column('A:A', 23.1, formats['cell_left'])
+    worksheet.set_column('B:B', 6, formats['cell_center'])
+    worksheet.set_column('C:C', 33.1, formats['cell_left'])
+    worksheet.set_column('D:D', 6, formats['cell_center'])
+    worksheet.set_column('E:E', 73, formats['cell_left_wrap'])
+    # for idx in range(5, len(column_names)):
+    for idx, col in enumerate(column_names):
+        # Format not-MDL columns
+        # if not re.findall(r'^\d{4}', col):
+        if not re.findall(r'MDL', col):
+            worksheet.write(get_column_range(idx+1, mode=1), col, formats['header_yellow'])
+            continue
+
+        # Get MSN
+        msn = col[:4]
+
+        # Format Column
+        worksheet.set_column(get_column_range(idx+1, mode=0), 8.7, formats['cell_center'])
+
+        # Colour all "D" or "PD" cells 
+        worksheet.conditional_format(get_column_range(idx+1, mode=2), {'type': 'formula', 'criteria': f'=ISNUMBER(SEARCH("D", ${get_column_range(idx+1, mode=3)}))', 'format': formats['EA_D']})
+
+        if msn in new_msn_list:
+            # Set format for New MSN headers
+            worksheet.write(get_column_range(idx+1, mode=1), col, formats['header_green'])
+        elif msn in rev_msn_list:
+            # Set format for Rev MSN headers
+            worksheet.write(get_column_range(idx+1, mode=1), col, formats['header_yellow'])
+            # Colour "N" or "PN" cells of Rev MSN
+            worksheet.conditional_format(get_column_range(idx+1, mode=2), {'type': 'formula', 'criteria': f'=ISNUMBER(SEARCH("N", ${get_column_range(idx+1, mode=3)}))', 'format': formats['EA_N']})
+        else:
+            # Set format for Old MSN headers
+            worksheet.write(get_column_range(idx+1, mode=1), col, formats['header_gray'])
+
+    worksheet.set_row(0, 60)
+
+
 def divmod_excel(n):
     a, b = divmod(n, 26)
     if b == 0:
@@ -643,106 +708,6 @@ def get_column_range(num: str, mode: int = 0):
         print('Wrong mode given, it was set to 0')
         return x + ':' + x
 
-# def pseudo_db_to_excel_OLD(df: pd.DataFrame, excelfilepath: str):
-    """
-    Save PseudoDataBase to Excel with custom formatting.
-    
-    Args:
-    ----------
-        df:
-            The PseudoDataBase DataFrame.
-        
-        excelfilepath:
-            The filepath of the Excel that will be created.
-    """
-    cell_left_format_dict = {
-        'right':        2,
-        'left':         2,
-        'bottom':       1,
-        'top':          1,
-        'align':        'left',
-        'valign':       'vcenter',
-        'num_format':   '@'
-    }
-    cell_center_format_dict = {
-        'right':        2,
-        'left':         2,
-        'bottom':       1,
-        'top':          1,
-        'align':        'center',
-        'valign':       'vcenter',
-        'num_format':   '@'
-    }
-    header_general_dict = {
-        'right':        2,
-        'left':         2,
-        'bottom':       2,
-        'top':          2,
-        'text_wrap':    True,
-        'bold':         True, 
-        'align':        'center',
-        'valign':       'vcenter',
-    }
-
-    # Create Dictionaries
-    header_blue_dict = header_general_dict.copy()
-    header_orange_dict = header_general_dict.copy()
-    header_green_dict = header_general_dict.copy()
-    header_yellow_dict = header_general_dict.copy()
-    header_blue_dict['bg_color'] = COLOR_HEADER_BLUE
-    header_orange_dict['bg_color'] = COLOR_HEADER_ORANGE
-    header_green_dict['bg_color'] = COLOR_HEADER_GREEN
-    header_yellow_dict['bg_color'] = COLOR_HEADER_YELLOW
-
-    # Creater Writer and write DataFrame to Excel
-    writer = pd.ExcelWriter(excelfilepath, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name='Pseudo_Data_Base')
-
-    # Get the xlsxwriter workbook and worksheet objects
-    workbook  = writer.book
-    worksheet = writer.sheets['Pseudo_Data_Base']
-
-    # Add formating to workbook
-    cell_left_format = workbook.add_format(cell_left_format_dict)
-    cell_center_format = workbook.add_format(cell_center_format_dict)
-    header_blue_format = workbook.add_format(header_blue_dict)
-    header_orange_format = workbook.add_format(header_orange_dict)
-    header_green_format = workbook.add_format(header_green_dict)
-    header_yellow_format = workbook.add_format(header_yellow_dict)
-    
-    # For Columns
-    worksheet.set_column('A:A', 17, cell_left_format)
-    worksheet.set_column('B:B', 11.5, cell_center_format)
-    worksheet.set_column('C:C', 10, cell_center_format)
-    worksheet.set_column('D:D', 10, cell_center_format)
-    worksheet.set_column('E:E', 10, cell_center_format)
-    worksheet.set_column('F:F', 64, cell_left_format)
-    worksheet.set_column('G:G', 10, cell_center_format)
-    worksheet.set_column('H:H', 10, cell_center_format)
-    worksheet.set_column('I:I', 10, cell_center_format)
-
-    # For Headers
-    column_names = list(df)
-    worksheet.freeze_panes(1, 0)
-    worksheet.write('A1', column_names[0], header_yellow_format)
-    worksheet.write('B1', column_names[1], header_yellow_format)
-    worksheet.write('C1', column_names[2], header_yellow_format)
-    worksheet.write('D1', column_names[3], header_yellow_format)
-    worksheet.write('E1', column_names[4], header_yellow_format)
-    worksheet.write('F1', column_names[5], header_yellow_format)
-    worksheet.write('G1', column_names[6], header_blue_format)
-    worksheet.write('H1', column_names[7], header_orange_format)
-    worksheet.write('I1', column_names[8], header_green_format)
-    worksheet.set_row(0, 20)
-
-    # Conditional formatting for highlighting True/False
-    true_cell_format = workbook.add_format({'bg_color': COLOR_LIGHT_GREEN})
-    false_cell_format = workbook.add_format({'bg_color': COLOR_LIGHT_RED})
-    worksheet.conditional_format('G2:I1048576', {'type': 'text', 'criteria': 'containing', 'value': 'TRUE', 'format': true_cell_format})
-    worksheet.conditional_format('G2:I1048576', {'type': 'text', 'criteria': 'containing', 'value': 'FALSE', 'format': false_cell_format})
-
-    # Save
-    writer.save()
 
 def pseudo_db_to_excel(df: pd.DataFrame, excelfilepath: str):
     """
@@ -906,3 +871,43 @@ def final_follow_up_to_excel(df_dsol: pd.DataFrame, df_ps: pd.DataFrame, df_nc: 
     # Save and close
     writer.save()
     # writer.close()
+
+def all_NCs_to_excel(df_nc: pd.DataFrame, df_nc_RXX: pd.DataFrame, new_msn_list: list, rev_msn_list: list, revision: str):
+    """
+    Format the 'ALL_NCs' or 'RXX_NCs' sheet.
+
+    Args:
+    ----------
+        df_nc:
+            The DataFrame with ALL the NCs.
+
+        df_nc_RXX:
+            The DataFrame with only the Current NCs.
+    
+        new_msn_list:
+            A list with the New MSNs for this revision.
+
+        rev_msn_list:
+            A list with the 90-Day Revision MSNs for this revision.
+
+        revision:
+            A string with the current revision. (i.e. 'R10')
+    """
+    # Get the xlsxwriter workbook and worksheet objects.
+    excelfilepath = f'ALL_NCs_R{revision}.xlsx'
+    writer = pd.ExcelWriter(excelfilepath, engine='xlsxwriter')
+    workbook = writer.book
+    workbook, formats = add_formats_to_workbook(workbook)
+
+    # Save DataFrame with 'ALL_NCs'
+    sheet_name = 'ALL_NCs'
+    df_nc.to_excel(writer, index=False, sheet_name=sheet_name)
+    format_sheet_ALL_NCs(writer, formats, sheet_name, list(df_nc.columns), new_msn_list, rev_msn_list)
+
+    # Save DataFrame with 'RXX_NCs'
+    sheet_name = f'{revision}_NCs'
+    df_nc_RXX.to_excel(writer, index=False, sheet_name=sheet_name)
+    format_sheet_ALL_NCs(writer, formats, sheet_name, list(df_nc_RXX.columns), new_msn_list, rev_msn_list)
+
+    # Save
+    writer.save()
