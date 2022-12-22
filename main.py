@@ -365,7 +365,7 @@ class MainWindow(QMainWindow):
     
     def fun_run_7(self):
         # Set filename of Excel
-        excelfilepath = f'EFW Follow-up Temporary.xlsx'
+        excelfilepath = f'EFW Follow-up New-Temporary.xlsx'
 
         # Initial Checks
         if not hasattr(self, 'filepath_mdl') or self.filepath_mdl == '':

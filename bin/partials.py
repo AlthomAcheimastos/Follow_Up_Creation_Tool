@@ -155,7 +155,7 @@ def get_follow_ups(filepath: str):
 
 def add_PNs_to_df_old(df_old: pd.DataFrame, df_new: pd.DataFrame, mdl_dict: dict):
     """
-    Add New Part Numbers added at the bottom of the OLD DataFrame.
+    Add New Part Numbers to the OLD DataFrame.
 
     Args:
     ----------
@@ -171,15 +171,16 @@ def add_PNs_to_df_old(df_old: pd.DataFrame, df_new: pd.DataFrame, mdl_dict: dict
     Returns:
     ----------
         df_old:
-            The original df_old with New Part Numbers added at the bottom. The relevant MDL columns are turned to NaN.
+            The original df_old with New Part Numbers added. The relevant MDL columns are turned to NaN.
     """
     # New Part Numbers that are not in Old Follow-Up
     df_not_in_old = df_new.copy().loc[~df_new['PART NUMBER'].isin(df_old['PART NUMBER'])].reset_index(drop=True)
     for mdl in mdl_dict.values():
         df_not_in_old[mdl] = np.nan
 
-    # Add "df_not_in_old" at the bottom of "df_old"
+    # Add "df_not_in_old" at the bottom of "df_old" and then sort
     df_old = pd.concat([df_old, df_not_in_old], ignore_index=True)
+    df_old = df_old.sort_values(by=['PART NUMBER', 'CSN', 'Fig', 'Type'])
 
     return df_old
 
