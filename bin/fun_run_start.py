@@ -299,7 +299,7 @@ def fun_run_8_start(filepath_json: str, filepath_json_authors: str, filepath_old
         # For simplicity
         mdl_dict = mdl_dict_new
 
-        # Add New Part Numbers added at the bottom of the "df_old"
+        # Add New Part Numbers to the "df_old"
         df_old = add_PNs_to_df_old(df_old, df_new, mdl_dict)
 
         # Keep only unique Part Numbers
@@ -310,7 +310,7 @@ def fun_run_8_start(filepath_json: str, filepath_json_authors: str, filepath_old
         # df_old['PART NUMBER'] = df_old['PART NUMBER'].replace('D113R1202-004-00', 'D999R9999-999-99')       # FOR TESTING
         # #
 
-        # Get 
+        # Update MDL columns on 'df_old' based on 'df_new'
         df_final = update_MDLs_in_df_old(df_old, df_new, mdl_dict)
         
         # Add Effectivity and Task column
@@ -330,6 +330,7 @@ def fun_run_8_start(filepath_json: str, filepath_json_authors: str, filepath_old
     console.emit('---> Finished.')
     console.emit('> Be carefull with cell ranges if you manually add drop down lists.')
     console.emit('> Manually set formatting of dates to DD/MM/YYYY.')
+    console.emit('> Manually convert "Time", "CC Time" and "CSN Changes" to Numbers.')
     console.emit('> Manually add any other Sheets.')
     console.emit('> Use "MSN Change" columns at the far right to manually colour the cells.')
 

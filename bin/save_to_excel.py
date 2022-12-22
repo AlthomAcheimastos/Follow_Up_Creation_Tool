@@ -221,7 +221,7 @@ def format_sheet_Follow_Up(writer, formats: dict, prop_dict: dict, column_names:
     worksheet.set_column('C:C', 7.4, formats['cell_center'])
     worksheet.set_column('D:D', 7.86, formats['cell_center'])
     worksheet.set_column('E:E', 56.4, formats['cell_left'])
-    worksheet.set_column('F:F', 5*(len(column_names)-15), formats['cell_left'])
+    worksheet.set_column('F:F', 0.86*max_length, formats['cell_left'])
     worksheet.set_column('G:G', 14.5, formats['cell_center'])
     worksheet.set_column('H:H', 13.2, formats['cell_center'])
     worksheet.set_column('I:I', 11, formats['cell_center'])
@@ -423,7 +423,7 @@ def add_sheet_QB(workbook, formats: dict, prop_dict: dict):
             An xlsxwriter workbook with the new Quality Board sheet.
     """
     QB_header_list = [
-        'PN', 'CSN', 'FIGURE', 'Author  (SC)', 'SC Date',
+        'PN', 'CSN', 'FIGURE', 'Author (SC)', 'SC Date',
         'Cross Checker (CC)', 'CC Date', 'RFT/WFT', 'OTD', 'Verification Number',
         'NC Number', 'NC Code', 'NC Quantity', 'Weight', 'Description of NC'
     ]
