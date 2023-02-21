@@ -39,6 +39,7 @@ DROP_LIST_STATUS = ['Not started', 'In progress', 'To be checked', 'Pending Info
 DROP_LIST_RFT_WFT = ['RFT', 'WFT']
 DROP_LIST_OTD = ['ON TIME', 'LATE']
 DROP_LIST_WEIGHT = ['E', 'I', 'S']
+DROP_LIST_WEIGHT_ILLU = ['R', 'I', 'S']
 DROP_LIST_MANUAL = ['IPC', 'SRM A321', 'SRM A320']
 DROP_LIST_ILLU = ['NEW AIB', 'NEW EFW', 'REVISION']
 DROP_LIST_YES_NO = ['Yes', 'No']
@@ -584,7 +585,7 @@ def add_sheet_QB_illu(workbook, formats: dict, prop_dict: dict):
     worksheet.data_validation('H2:H1500', {'validate': 'list', 'source': DROP_LIST_ILLU})
     worksheet.data_validation('O2:O1500', {'validate': 'list', 'source': DROP_LIST_RFT_WFT})
     worksheet.data_validation('P2:P1500', {'validate': 'list', 'source': DROP_LIST_OTD})
-    worksheet.data_validation('U2:U1500', {'validate': 'list', 'source': DROP_LIST_WEIGHT})
+    worksheet.data_validation('U2:U1500', {'validate': 'list', 'source': DROP_LIST_WEIGHT_ILLU})
     worksheet.data_validation('X2:X1500', {'validate': 'list', 'source': DROP_LIST_YES_NO})
     worksheet.data_validation('Y2:Y1500', {'validate': 'list', 'source': DROP_LIST_YES_NO})
 
@@ -836,7 +837,7 @@ def final_follow_up_to_excel(df_dsol: pd.DataFrame, df_ps: pd.DataFrame, df_nc: 
     prop_dict = {
         'IPC': {'sheetname': 'IPC Follow-up', 'color': COLOR_HEADER_BLUE, 'header_format': formats['header_blue'], 'authors': list_of_authors_IPC},
         'SRM_A321': {'sheetname': 'SRM A321 Follow-up', 'color': COLOR_HEADER_ORANGE, 'header_format': formats['header_orange'], 'authors': list_of_authors_SRM},
-        'SRM_A320': {'sheetname': 'SRM A320 Foolow-up', 'color': COLOR_HEADER_GREEN, 'header_format': formats['header_green'], 'authors': list_of_authors_SRM},
+        'SRM_A320': {'sheetname': 'SRM A320 Follow-up', 'color': COLOR_HEADER_GREEN, 'header_format': formats['header_green'], 'authors': list_of_authors_SRM},
         'DSOL': {'sheetname': 'DSOL', 'color': COLOR_HEADER_YELLOW, 'header_format': formats['header_yellow']},
         'PS': {'sheetname': 'PS', 'color': COLOR_HEADER_YELLOW, 'header_format': formats['header_yellow']},
         'NC': {'sheetname': 'NC', 'color': COLOR_HEADER_YELLOW, 'header_format': formats['header_yellow']}

@@ -318,14 +318,22 @@ def add_task_column(df: pd.DataFrame, rev_msn_list: list):
     df.insert(loc=idx, column='TASK', value=task_column)
     return df
 
-def add_columns_to_Follow_Up(df_follow_up: pd.DataFrame):
+def add_columns_to_Follow_Up(df_follow_up: pd.DataFrame, is_SRM_A321: bool = False, is_SRM_A320: bool = False):
     """Add extra columns to Follow-up Dataframe"""
+
+    extra_column_list = ['Author', 'Start Date', 'Status', 'Time (minutes)', 'Author CC', 'CC Time (minutes)', 'Comments']
+    if is_SRM_A321 is True:
+        extra_column_list.append('SRM A321 CSN')
+    elif is_SRM_A320 is True:
+        extra_column_list.append('SRM A320 CSN')
+    else:
+        extra_column_list.append('IPC CSN')
 
     empty_column_follow_up = ['' for i in range(df_follow_up.shape[0])]
     if 'CSN' not in list(df_follow_up.columns):
         for col in reversed(['CSN', 'Fig', 'Type']):
             df_follow_up.insert(loc=1, column=col, value=empty_column_follow_up)
-    for col in reversed(['Author', 'Start Date', 'Status', 'Time (minutes)', 'Author CC', 'CC Time (minutes)', 'Comments', 'IPC CSN']):
+    for col in reversed(extra_column_list):
         df_follow_up.insert(loc=7, column=col, value=empty_column_follow_up)
 
     return df_follow_up

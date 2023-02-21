@@ -219,7 +219,7 @@ def fun_run_3_start(filepath_json: str, filepath_mdl: str, filepath_pseudo_db: s
 
     # Add extra columns
     df_IPC = add_columns_to_Follow_Up(df_IPC)
-    df_SRM_A321 = add_columns_to_Follow_Up(df_SRM_A321)
+    df_SRM_A321 = add_columns_to_Follow_Up(df_SRM_A321, is_SRM_A321=True)
     df_ps = add_columns_to_PS(df_ps)
     df_nc = add_columns_to_NC(df_nc)
 
@@ -235,7 +235,7 @@ def fun_run_3_start(filepath_json: str, filepath_mdl: str, filepath_pseudo_db: s
     if current_A320_msn_list:
         df_SRM_A320 = add_effectivity_column(df_SRM_A320, 'FOLLOW_UP')
         df_SRM_A320 = add_task_column(df_SRM_A320, rev_msn_list)
-        df_SRM_A320 = add_columns_to_Follow_Up(df_SRM_A320)
+        df_SRM_A320 = add_columns_to_Follow_Up(df_SRM_A320, is_SRM_A320=True)
         dict_with_follow_ups['SRM_A320'] = df_SRM_A320
 
     # Save to Excel

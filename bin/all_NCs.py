@@ -88,6 +88,9 @@ def update_90_day_rev(nc_dict_new: dict, nc_dict_old: dict, rev_msn_list: list):
         mdl_old = list(df_old.columns)[-1]
         mdl_new = list(df_new.columns)[-1]
 
+        # In case a 90-Day MDL has not changed revision, then skip it
+        if mdl_old == mdl_new: continue
+
         # Merge "df_old" and "df_new"
         df_merged = pd.merge(df_old, df_new, on=title_list, how='outer')
         df_merged = df_merged.drop_duplicates()                                                                     
