@@ -328,8 +328,8 @@ class MainWindow(QMainWindow):
     def fun_run_3(self):
         # Get Revision and excelfilepath
         revision = self.findChild(QLineEdit, 'input_revision').text()
-        if revision == '': revision = '99'
-        excelfilepath = f'EFW Follow-up R{revision}.xlsx'
+        if revision == '': revision = 'RXX'
+        excelfilepath = f'EFW Follow-up {revision}.xlsx'
 
         # Initial Checks
         if not hasattr(self, 'filepath_mdl') or self.filepath_mdl == '':
@@ -443,7 +443,7 @@ class MainWindow(QMainWindow):
         """
         # Get Revision and excelfilepath
         revision = self.findChild(QLineEdit, 'input_revision_2').text()
-        if revision == '': revision = 'XX'
+        if revision == '': revision = 'RXX'
         # excelfilepath = f'ALL_NCs_R{revision}.xlsx'
 
         # Initial Checks

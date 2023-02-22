@@ -366,7 +366,7 @@
              <item>
               <widget class="QLineEdit" name="input_revision">
                <property name="placeholderText">
-                <string>i.e. 10</string>
+                <string>i.e. R10</string>
                </property>
               </widget>
              </item>
@@ -550,8 +550,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>411</width>
-           <height>194</height>
+           <width>211</width>
+           <height>150</height>
           </rect>
          </property>
          <attribute name="label">
@@ -671,8 +671,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>411</width>
-           <height>194</height>
+           <width>98</width>
+           <height>28</height>
           </rect>
          </property>
          <attribute name="label">
@@ -831,8 +831,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>411</width>
-           <height>197</height>
+           <width>98</width>
+           <height>28</height>
           </rect>
          </property>
          <attribute name="label">
@@ -947,8 +947,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>411</width>
-           <height>197</height>
+           <width>98</width>
+           <height>28</height>
           </rect>
          </property>
          <attribute name="label">
@@ -1059,6 +1059,14 @@ p, li { white-space: pre-wrap; }
          </widget>
         </widget>
         <widget class="QWidget" name="page">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>411</width>
+           <height>197</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Create ALL_NCs</string>
          </attribute>
@@ -1167,7 +1175,7 @@ p, li { white-space: pre-wrap; }
                 <set>Qt::AlignCenter</set>
                </property>
                <property name="placeholderText">
-                <string>i.e. 10</string>
+                <string>i.e. R10</string>
                </property>
               </widget>
              </item>

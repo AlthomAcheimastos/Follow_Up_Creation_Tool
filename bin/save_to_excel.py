@@ -895,7 +895,7 @@ def all_NCs_to_excel(df_nc: pd.DataFrame, df_nc_RXX: pd.DataFrame, new_msn_list:
             A string with the current revision. (i.e. 'R10')
     """
     # Get the xlsxwriter workbook and worksheet objects.
-    excelfilepath = f'ALL_NCs_R{revision}.xlsx'
+    excelfilepath = f'ALL_NCs_{revision}.xlsx'
     writer = pd.ExcelWriter(excelfilepath, engine='xlsxwriter')
     workbook = writer.book
     workbook, formats = add_formats_to_workbook(workbook)
