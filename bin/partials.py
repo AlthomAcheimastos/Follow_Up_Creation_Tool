@@ -54,7 +54,8 @@ def compare_mdl_values(old_value: str, df_1_x_1):
         return 'PD'                 # Phantom Deleted (should be marked with 'TRUE')
 
 
-    if old_value in ['N', 'R', '-']:
+    # if old_value in ['N', 'R', '-']:
+    if old_value in ['N', 'R', '-', '-Q', '-T', '- Q', '- T']:  # Update 01/03/2023: added '-Q', '-T', '- Q', '- T'
         if new_value == 'D' or pd.isna(new_value):
             return 'PD'             # Phantom Deleted (should be marked with 'TRUE')
         else:

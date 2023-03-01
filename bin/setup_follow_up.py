@@ -275,11 +275,11 @@ def add_effectivity_column(df_merged: pd.DataFrame, sheet: str, rev_msn_list: li
         if rev_msn_list and msn in rev_msn_list:
             # df_effect[msn] = df_effect[msn].apply(lambda x: msn if x != '' else np.nan)                                       # Original
             # df_effect[msn] = df_effect[msn].apply(lambda x: msn if ((x != '') or (pd.notna(x))) else np.nan)                  # One way to also work with NaN
-            df_effect[msn] = df_effect[msn].apply(lambda x: msn if ['N', 'R', '-', 'D', 'WTF'] else np.nan)
+            df_effect[msn] = df_effect[msn].apply(lambda x: msn if ['N', 'R', '-', 'D', 'WTF', '-Q', '-T', '- Q', '- T'] else np.nan)  # Update 01/03/2023: added '-Q', '-T', '- Q', '- T'
         else:
             # df_effect[msn] = df_effect[msn].apply(lambda x: msn if x != '' and x != 'D' else np.nan)                          # Original
             # df_effect[msn] = df_effect[msn].apply(lambda x: msn if ((x != '') and (pd.notna(x))) and x != 'D' else np.nan)    # One way to also work with NaN
-            df_effect[msn] = df_effect[msn].apply(lambda x: msn if x in ['N', 'R', '-', 'WTF'] else np.nan)
+            df_effect[msn] = df_effect[msn].apply(lambda x: msn if x in ['N', 'R', '-', 'WTF', '-Q', '-T', '- Q', '- T'] else np.nan)   # Update 01/03/2023: added '-Q', '-T', '- Q', '- T'
     df_effect = df_effect.apply(lambda x: ', '.join(x[x.notnull()]), axis = 1)
 
     # Insert Effectivity Column
