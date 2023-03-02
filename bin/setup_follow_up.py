@@ -88,6 +88,10 @@ def read_MDLs_current(rootdir: str, current_msn_list: list):
 
         follow_up_list:     
             List containing DataFrames for each MSN in order to create Follow-Up.
+    
+    Extra Info:
+    ----------
+        Symbols '-Q' and '-T' are replaced by 'R' just to be sure.
     """
     mdl_msn_list = []
     follow_up_list = []
@@ -108,6 +112,7 @@ def read_MDLs_current(rootdir: str, current_msn_list: list):
                     # Read Sheet 'Applicable Part List' to create Follow-Up DataFrame (for New MSNs)
                     df = pd.read_excel(root + os.sep + file, dtype=str, sheet_name='Applicable Part List')
                     df = df[['PART NUMBER', 'PART TITLE', 'QTY', 'PART TYPE', 'PART ISSUE', 'DIFF']]    # Keep only these columns
+                    df['DIFF'] = df['DIFF'].replace(['-Q', '-T', '- Q', '- T'], 'R')                    # Update 02/03/2023: Replace with 'R'
                     df = df.rename(columns={'DIFF': mdl_column})
                     for column in df.columns: df[column] = df[column].str.strip()                       # Strip leading and trailing whitespaces
                     df = df.loc[ df['PART TYPE'] == 'DSOL']
@@ -145,6 +150,10 @@ def read_MDLs(rootdir: str, current_msn_list: list):
 
         nc_list:
             List containing DataFrames for each MSN in order to create NC.
+
+    Extra Info:
+    ----------
+        Symbols '-Q' and '-T' are replaced by 'R' just to be sure.
     """
     mdl_msn_list = []
     dsol_list = []
@@ -167,6 +176,7 @@ def read_MDLs(rootdir: str, current_msn_list: list):
                 # Read Sheet 'Product Structure' (for All MSNs)
                 df = pd.read_excel(root + os.sep + file, dtype=str, sheet_name='Product Structure')
                 df = df[['PARENT NUMBER', 'LEVEL', 'CHILD NUMBER', 'CHILD TITLE', 'DIFF']]                          # Keep only these columns
+                df['DIFF'] = df['DIFF'].replace(['-Q', '-T', '- Q', '- T'], 'R')                                    # Update 02/03/2023: Replace with 'R'
                 df = df.rename(columns={'DIFF': mdl_column})
                 for column in df.columns: df[column] = df[column].str.strip()                                       # Strip leading and trailing whitespaces
                 df = df.loc[ df['CHILD TITLE'].map(lambda x: False if re.findall(r'DELET|SALV', x) else True) ]     # Drop "Deleted" and "Salvage"
@@ -176,29 +186,22 @@ def read_MDLs(rootdir: str, current_msn_list: list):
                 # Read Sheet 'Applicable Part List' to create DSOL (for All MSNs)
                 df = pd.read_excel(root + os.sep + file, dtype=str, sheet_name='Applicable Part List')
                 df = df[['PART NUMBER', 'PART TITLE', 'QTY', 'PART TYPE', 'PART ISSUE', 'DIFF']]    # Keep only these columns
+                df['DIFF'] = df['DIFF'].replace(['-Q', '-T', '- Q', '- T'], 'R')                    # Update 02/03/2023: Replace with 'R'
                 df = df.rename(columns={'DIFF': mdl_column})
                 for column in df.columns: df[column] = df[column].str.strip()                       # Strip leading and trailing whitespaces
                 dsol_list.append(df)
 
-                # Create Follow-Up DataFrame from 'Applicable Part List' (only for New MSNs)
                 if msn in current_msn_list:
+                    # Create Follow-Up DataFrame from 'Applicable Part List' (only for New MSNs)
                     df = df.loc[ df['PART TYPE'] == 'DSOL']
                     df = df.loc[ df['PART NUMBER'].map(lambda x: True if re.findall(r'R0|R1|R3', x) else False) ]       # Keep only "R0", "R1" and "R3"
                     df = df.drop(['QTY', 'PART TYPE', 'PART ISSUE'], axis=1)
                     follow_up_list.append(df)
 
-                    # # Read Sheet 'Product Structure' (only for New MSNs)
-                    # df = pd.read_excel(root + os.sep + file, dtype=str, sheet_name='Product Structure')
-                    # df = df[['PARENT NUMBER', 'LEVEL', 'CHILD NUMBER', 'CHILD TITLE', 'DIFF']]                          # Keep only these columns
-                    # df = df.rename(columns={'DIFF': mdl_column})
-                    # for column in df.columns: df[column] = df[column].str.strip()                                       # Strip leading and trailing whitespaces
-                    # df = df.loc[ df['CHILD TITLE'].map(lambda x: False if re.findall(r'DELET|SALV', x) else True) ]     # Drop "Deleted" and "Salvage"
-                    # df = df.loc[ df['CHILD NUMBER'].map(lambda x: False if re.findall(r'R6|R7', x) else True) ]         # Drop "R6" and "R7"
-                    # ps_list.append(df)
-
                     # Read Sheet 'Nonconformities' (only for New MSNs)
                     df = pd.read_excel(root + os.sep + file, dtype=str, sheet_name='Nonconformities')
                     df = df[['NUMBER', 'ISSUE', 'NC NUMBER', 'NC ISSUE', 'NC TITLE', 'DIFF']]           # Keep only these columns
+                    df['DIFF'] = df['DIFF'].replace(['-Q', '-T', '- Q', '- T'], 'R')                    # Update 02/03/2023: Replace with 'R'
                     df = df.rename(columns={'DIFF': mdl_column})
                     for column in df.columns: df[column] = df[column].str.strip()                       # Strip leading and trailing whitespaces
                     nc_list.append(df)

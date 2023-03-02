@@ -28,6 +28,10 @@ def read_MDLs_for_NCs(rootdir: str):
 
         nc_dict:
             Dict containing DataFrames for each MSN in order to create NC.
+    
+    Extra Info:
+    ----------
+        Symbols '-Q' and '-T' are replaced by 'R' just to be sure.
     """
     mdl_msn_list = []
     nc_dict = {}
@@ -50,6 +54,7 @@ def read_MDLs_for_NCs(rootdir: str):
                 df = df[['NUMBER', 'ISSUE', 'NC NUMBER', 'NC ISSUE', 'NC TITLE', 'DIFF']]           # Keep only these columns
                 for column in df.columns: df[column] = df[column].str.strip()                       # Strip leading and trailing whitespaces
                 ### df['DIFF'] = df['DIFF'].replace(' ', np.nan)                                        # Read as NaN, this is already NaN
+                df['DIFF'] = df['DIFF'].replace(['-Q', '-T', '- Q', '- T'], 'R')                    # Update 02/03/2023: Replace with 'R'
                 df = df.rename(columns={'DIFF': mdl_column})
                 nc_dict[msn] = df
 
