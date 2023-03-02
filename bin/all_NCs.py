@@ -103,7 +103,7 @@ def update_90_day_rev(nc_dict_new: dict, nc_dict_old: dict, rev_msn_list: list):
 
         # Find "Phantom-New" and "Phantom-Deleted" EAs and DCNs
         df_merged[mdl_new] = df_merged[mdl_new].fillna('PD')
-        df_merged[mdl_new] = df_merged.apply(lambda row: 'PN' if (row[mdl_new] == 'R' or row[mdl_new] == '-') and (row[mdl_new] == 'D') else row[mdl_new], axis=1)
+        df_merged[mdl_new] = df_merged.apply(lambda row: 'PN' if (row[mdl_new] == 'R' or row[mdl_new] == '-') and (row[mdl_old] == 'D') else row[mdl_new], axis=1)
         df_merged[mdl_new] = df_merged.apply(lambda row: 'PN' if (row[mdl_new] == 'R' or row[mdl_new] == '-') and (pd.isna(row[mdl_old])) else row[mdl_new], axis=1)
 
         # Replace "nc_dict_new" with the df_merged
